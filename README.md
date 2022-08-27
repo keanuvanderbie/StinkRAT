@@ -1,4 +1,4 @@
-### stinkRAT
+### StinkRAT
 - A basic RAT made with C#, controlled by a Discord bot
 
 ## Features
