@@ -15,3 +15,10 @@
     - Spam terminal windows (!terminals)
     - Autostarts when they boot up too
 ```
+
+## How to use
+``` 
+    - Find the "TOKEN" variable and replace it with your own bot token
+    - Provide the ID for the guild and channel you will control the bot from
+    - Now you can build the file
+```
