@@ -9,10 +9,10 @@
     - Show open apps (!processes)
     - Kill tasks (!execute KILLTASK <task>)
     - Execute CMD Commands (!execute <command>) For powershell (!execute powershell <command>)
-    - Get IP (!ip)
     - Shutdown machine (!shutdown)
     - Fake notification sound (!notification)
     - Spam terminal windows (!terminals)
+    - Take a screenshot (!screenshot)
     - Autostarts when they boot up too
 ```
 
