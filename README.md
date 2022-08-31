@@ -13,6 +13,8 @@
     - Fake notification sound (!notification)
     - Spam terminal windows (!terminals)
     - Take a screenshot (!screenshot)
+    - See files (!ls <directory>), e.g. !ls C:\Users\<username>\Downloads
+    - Download files (!download <file>), e.g. !ls C:\Users\<username>\Downloads\image.png
     - Autostarts when they boot up too
 ```
 
